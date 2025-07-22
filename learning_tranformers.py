@@ -260,6 +260,18 @@ for step in (pbar := tqdm(range(epochs))):
             print(f"Validation loss: {val_loss.item():.4f}")
 
         m.train()  # <--- Important: switch back to train mode after eval
+    
+    if step % 500 == 0 and step > 0:
+        val_loss_value = val_loss.item()
+        checkpoint_path = f"model_val{val_loss_value:.4f}_step{step}.pt"
+        torch.save(m.state_dict(), checkpoint_path)
+        wandb.save(checkpoint_path)
+        wandb.log({
+            "checkpoint_saved_step": step,
+            "checkpoint_val_loss": val_loss_value,
+            "checkpoint_path": checkpoint_path
+        })
+        print(f"Saved checkpoint: {checkpoint_path}")
 
 print(f"Final training loss: {loss.item():.4f}")
 
