@@ -51,7 +51,7 @@ n_embd = 256
 n_layers = 12
 n_heads = 6
 dropout = 0.3
-learning_rate = 1e-4
+learning_rate = 1e-5
 
 batch_size = 184
 block_size = 256
