@@ -20,7 +20,7 @@ epochs=10000
 
 print(f"Using device: {device}")
 
-#setup
+# Setup
 with open('pg52882.txt') as f:
   text = f.read()
 
@@ -35,15 +35,13 @@ itos = {i:j for i,j in enumerate(characters)}
 encode = lambda x: [stoi[j] for j in x]
 decode = lambda x: ''.join([itos[j] for j in x])
 
-# decode(encode('hey'))
-
-#cut of the end of the data
+# Cut of the end of the data
 full_data = torch.tensor(encode(text), dtype=torch.long)
 end=0.9
 full_data_length = len(full_data)
 data = full_data[int(full_data_length*0.9):]
 
-# reserve some for validation
+# Reserve some for validation
 n = int(0.9*len(data))
 train_data = data[:n]
 validation_data = data[n:]
