@@ -66,10 +66,10 @@ validation_data = data[n:]
 # decode(train_data[:block_size+1].tolist())
 
 n_embd = 256
-n_layers = 6
+n_layers = 12
 n_heads = 6
-dropout = 0.2
-learning_rate = 2e-5
+dropout = 0.3
+learning_rate = 1e-4
 
 # x = train_data[:block_size]
 # y = train_data[1:block_size+1]
@@ -78,7 +78,7 @@ learning_rate = 2e-5
 #   target = y[t]
 #   print(f"when input is  {context} the target is: {target}")
 
-batch_size = 368
+batch_size = 184
 block_size = 256
 
 def get_batch(split):
@@ -222,7 +222,12 @@ m = torch.compile(m)
 
 
 
-optimizer = torch.optim.AdamW(m.parameters(), lr=learning_rate)
+optimizer = torch.optim.AdamW(m.parameters(), lr=learning_rate, weight_decay=1e-2)
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+    optimizer,
+    T_max=epochs,       # number of steps to complete 1 cosine cycle
+    eta_min=1e-6        # final learning rate after decay
+)
 
 # batch_size = 32
 
@@ -246,7 +251,9 @@ for step in (pbar := tqdm(range(epochs))):
     optimizer.zero_grad(set_to_none=True)
     loss.backward()
     optimizer.step()
-    wandb.log({"loss": loss.item(), "step": step})
+    scheduler.step()
+
+    wandb.log({"loss": loss.item(), "step": step, "lr": scheduler.get_last_lr()[0]})
 
     if step % 100 == 0:
         print(f"Step {step}, loss: {loss.item():.4f}")
